@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Shopping Cart</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        table { width: 80%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .total { font-weight: bold; font-size: 1.2em; }
+        .checkout-button { 
+            display: inline-block; 
+            margin-top: 20px; 
+            font-size: 1.2em; 
+            color: white; 
+            background-color: #007bff; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            text-align: center;
+        }
+        .back-link { margin-left: 15px; }
+    </style>
+</head>
+<body>
+    <h1>Your Shopping Cart</h1>
+
+    {% if cart_items %}
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Action</th> </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>${{ item.product.current_price }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.line_item_price|floatformat:2 }}</td>
+                
+                <td>
+                    <form action="{% url 'remove_from_cart' item.product.id %}" method="post">
+                        {% csrf_token %} 
+                        <button type="submit">Remove</button>
+                    </form>
+                </td>
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="total">Total Price:</td>
+                <td colspan="2" class="total">${{ cart_total_price|floatformat:2 }}</td> 
+                </tr>
+        </tfoot>
+    </table>
+
+    <a href="{% url 'checkout' %}" class="checkout-button">
+        Proceed to Checkout
+    </a>
+    <a href="{% url 'product_list' %}" class="back-link">Continue Shopping</a>
+
+    {% else %}
+    <p>Your cart is empty.</p>
+    <a href="{% url 'product_list' %}">Go Shopping</a>
+    {% endif %}
+
+</body>
+</html>

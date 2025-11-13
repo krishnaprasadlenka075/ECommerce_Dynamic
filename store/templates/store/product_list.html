@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic Price Store</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .product-card { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            border-radius: 5px; 
+            max-width: 400px;
+        }
+        .price { 
+            font-size: 1.5em; 
+            font-weight: bold; 
+            color: green; 
+        }
+        .base-price { 
+            color: gray; 
+            text-decoration: line-through; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Our Products (Dynamic Pricing Demo)</h1>
+
+    <p>
+        Your Cart has 
+        <strong>
+            {{ request.session.cart|length|default:0 }} 
+        </strong> 
+        unique items.
+        
+        {% if request.session.cart|length > 0 %}
+            <a href="{% url 'cart_detail' %}">View Cart</a>
+        {% endif %}
+    </p>
+    {% for product in products %}
+    <div class="product-card">
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.description|default:"No description provided." }}</p>
+
+        <p>Stock: <strong>{{ product.stock_quantity }}</strong></p>
+
+        <p>
+            {% if product.current_price < product.base_price %}
+                <span class="base-price">Base Price: ${{ product.base_price }}</span>
+                <br>
+                <span class="price">SALE: ${{ product.current_price }}</span>
+            {% else %}
+                <span class="price">Price: ${{ product.current_price }}</span>
+            {% endif %}
+        </p>
+
+        <form action="{% url 'add_to_cart' product.id %}" method="post">
+            {% csrf_token %} 
+            <button type="submit">Add to Cart</button>
+        </form>
+        </div>
+    {% empty %}
+    <p>No active products found in the store.</p>
+    {% endfor %}
+
+</body>
+</html>
